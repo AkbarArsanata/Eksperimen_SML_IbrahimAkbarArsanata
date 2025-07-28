@@ -35,9 +35,11 @@ jobs:
       run: |
         git config user.name github-actions[bot]
         git config user.email github-actions[bot]@users.noreply.github.com
-        git add churn_train_preprocessed.csv churn_test_preprocessed.csv
+        # --- PERUBAHAN PENTING DI BARIS INI ---
+        # File output berada di dalam folder 'preprocessing/', jadi kita perlu menyertakan path tersebut.
+        git add preprocessing/churn_train_preprocessed.csv preprocessing/churn_test_preprocessed.csv
         git commit -m "Auto: Preprocessed data after push" || echo "No changes to commit"
-        # Baris ini telah diperbarui untuk menggunakan GITHUB_TOKEN
+        # Baris ini memastikan push menggunakan GITHUB_TOKEN untuk otentikasi
         git push https://github.com/${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-      # Tambahkan ini untuk mencegah workflow gagal jika tidak ada perubahan untuk di-commit
+      # Ini mencegah workflow gagal total jika tidak ada perubahan untuk di-commit (misal, output sama)
       continue-on-error: true
