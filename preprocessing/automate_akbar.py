@@ -19,7 +19,7 @@ def automate_data_preprocessing(df: pd.DataFrame, target_column: str, test_size:
 
     Returns:
         tuple: Mengembalikan X_train_smote, X_test, y_train_smote, y_test
-               setelah semua proses preprocessing.
+                setelah semua proses preprocessing.
     """
 
     # --- 1. One-Hot Encoding ---
@@ -77,7 +77,8 @@ def automate_data_preprocessing(df: pd.DataFrame, target_column: str, test_size:
 
     # --- 6. Standard Scaling ---
     features_to_scale = [
-        'CreditScore', 'Age', 'Balance', 'NumOfProducts', 'EstimatedSalary'
+        'CreditScore', 'Age', 'Balance', 'NumOfProducts', 'EstimatedSalary',
+        'Tenure' # Menambahkan 'Tenure' di sini
     ]
     if 'BalanceToSalaryRatio' in X_train.columns:
         features_to_scale.append('BalanceToSalaryRatio')
