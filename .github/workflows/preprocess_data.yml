@@ -13,6 +13,9 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      # Tambahkan token ini untuk memastikan checkout memiliki izin tulis
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -35,11 +38,11 @@ jobs:
       run: |
         git config user.name github-actions[bot]
         git config user.email github-actions[bot]@users.noreply.github.com
-        # --- PERUBAHAN PENTING DI BARIS INI ---
         # File output berada di dalam folder 'preprocessing/', jadi kita perlu menyertakan path tersebut.
         git add preprocessing/churn_train_preprocessed.csv preprocessing/churn_test_preprocessed.csv
         git commit -m "Auto: Preprocessed data after push" || echo "No changes to commit"
-        # Baris ini memastikan push menggunakan GITHUB_TOKEN untuk otentikasi
-        git push https://github.com/${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        # --- PERUBAHAN PENTING DI BARIS INI ---
+        # Cukup push ke origin karena token sudah diberikan pada langkah checkout
+        git push
       # Ini mencegah workflow gagal total jika tidak ada perubahan untuk di-commit (misal, output sama)
       continue-on-error: true
