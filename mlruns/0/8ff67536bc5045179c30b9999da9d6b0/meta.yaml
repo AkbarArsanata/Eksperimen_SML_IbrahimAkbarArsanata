@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/8ff67536bc5045179c30b9999da9d6b0/artifacts
+end_time: 1753684154585
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 8ff67536bc5045179c30b9999da9d6b0
+run_name: Decision Tree Classifier_Training_Val
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1753684150245
+status: 3
+tags: []
+user_id: User

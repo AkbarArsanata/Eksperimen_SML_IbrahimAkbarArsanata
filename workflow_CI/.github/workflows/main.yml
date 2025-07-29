@@ -1,0 +1,123 @@
+name: MLflow CI/CD Workflow for Model Retraining
+
+on:
+  push:
+    branches:
+      - main # Workflow akan terpantik setiap kali ada push ke branch 'main'
+
+jobs:
+  train-model:
+    runs-on: ubuntu-latest # Jalankan job di runner Ubuntu terbaru
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # Mengambil kode dari repositori
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2 # Mengatur Miniconda di runner
+        with:
+          python-version: "3.9" # Pastikan versi Python sesuai dengan conda.yaml
+          auto-activate-base: false # Jangan aktifkan base environment secara otomatis
+
+      - name: Install MLflow and dependencies
+        shell: bash # Menggunakan bash shell untuk perintah
+        run: |
+          # Perbarui lingkungan Conda berdasarkan conda.yaml
+          conda env update --file MLProject/conda.yaml --name churn-prediction-env
+          # Aktifkan lingkungan Conda yang baru dibuat
+          conda activate churn-prediction-env
+          # Pastikan mlflow terinstal di lingkungan ini (jika belum ada di conda.yaml)
+          # pip install mlflow
+
+      - name: Run MLflow Project and Capture Run ID
+        id: mlflow_run # Memberikan ID ke langkah ini agar outputnya bisa diakses oleh job lain
+        shell: bash
+        run: |
+          conda activate churn-prediction-env
+          # Set MLFLOW_TRACKING_URI ke direktori lokal di runner GitHub Actions
+          # Ini akan menyimpan artefak MLflow (termasuk model) di folder 'mlruns'
+          export MLFLOW_TRACKING_URI=./mlruns
+          
+          # Buat file sementara untuk menyimpan Run ID
+          RUN_ID_FILE="mlflow_run_id.txt"
+          
+          # Jalankan proyek MLflow dan simpan Run ID ke file
+          # --run-id-file adalah cara yang bersih untuk mendapatkan Run ID
+          mlflow run MLProject/ --run-id-file $RUN_ID_FILE
+          
+          # Baca Run ID dari file
+          run_id=$(cat $RUN_ID_FILE)
+          echo "Captured MLflow Run ID: $run_id"
+          
+          # Jadikan Run ID tersedia sebagai output langkah ini
+          # Ini akan diakses oleh job 'build-and-push-docker'
+          echo "run_id=$run_id" >> $GITHUB_OUTPUT
+
+      - name: Upload MLflow Artifacts (mlruns directory)
+        uses: actions/upload-artifact@v3 # Mengunggah artefak dari job ini
+        with:
+          name: mlflow-artifacts # Nama artefak yang akan diunggah
+          path: mlruns/ # Direktori yang akan diunggah
+          retention-days: 7 # Opsional: Berapa lama artefak akan disimpan (misal: 7 hari)
+
+  build-and-push-docker:
+    runs-on: ubuntu-latest # Jalankan job di runner Ubuntu terbaru
+    needs: train-model # Job ini akan berjalan hanya setelah 'train-model' berhasil diselesaikan
+
+    environment:
+      name: docker-hub # Anda bisa mendefinisikan environment untuk secrets, opsional
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # Mengambil kode dari repositori
+
+      - name: Download MLflow Artifacts
+        uses: actions/download-artifact@v3 # Mengunduh artefak 'mlruns' dari job sebelumnya
+        with:
+          name: mlflow-artifacts
+          path: mlruns/ # Path di mana artefak akan diunduh
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2 # Mengatur Miniconda
+        with:
+          python-version: "3.9"
+          auto-activate-base: false
+
+      - name: Install MLflow
+        shell: bash
+        run: |
+          conda activate base # Atau buat env baru jika diperlukan
+          pip install mlflow # Instal MLflow untuk menggunakan 'mlflow build-docker'
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2 # Menggunakan action untuk login ke Docker Hub
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }} # Mengambil username dari GitHub Secrets
+          password: ${{ secrets.DOCKER_PASSWORD }} # Mengambil password/token dari GitHub Secrets
+
+      - name: Build and Push Docker Image
+        shell: bash
+        run: |
+          # Dapatkan Run ID dari output job 'train-model'
+          MLFLOW_RUN_ID="${{ needs.train-model.outputs.run_id }}"
+          echo "Using MLflow Run ID: $MLFLOW_RUN_ID for Docker build."
+
+          # Definisikan username Docker Hub dan nama image Anda
+          # Ganti 'your-dockerhub-username' dengan username Docker Hub Anda
+          DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}" 
+          IMAGE_NAME="churn-prediction-model" # Nama image Docker Anda
+          IMAGE_TAG="latest" # Atau gunakan $MLFLOW_RUN_ID untuk tag unik setiap build
+
+          # Set MLFLOW_TRACKING_URI agar mlflow build-docker dapat menemukan model
+          export MLFLOW_TRACKING_URI=./mlruns
+
+          # Bangun Docker image untuk model yang dilog oleh MLflow
+          # 'model' adalah nama artefak default yang digunakan oleh mlflow.sklearn.autolog()
+          mlflow build-docker --model-uri "runs:/$MLFLOW_RUN_ID/model" \
+                              --name "$DOCKER_USERNAME/$IMAGE_NAME" \
+                              --tag "$IMAGE_TAG"
+
+          # Dorong Docker image ke Docker Hub
+          docker push "$DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+          echo "Docker image $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG pushed to Docker Hub."
+          echo "Tautan ke Docker Hub: https://hub.docker.com/r/$DOCKER_USERNAME/$IMAGE_NAME"
