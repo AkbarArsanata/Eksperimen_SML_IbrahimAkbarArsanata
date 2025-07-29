@@ -40,15 +40,12 @@ jobs:
           # Ini akan menyimpan artefak MLflow (termasuk model) di folder 'mlruns'
           export MLFLOW_TRACKING_URI=./mlruns
           
-          # Buat file sementara untuk menyimpan Run ID
-          RUN_ID_FILE="mlflow_run_id.txt"
+          # Jalankan proyek MLflow dan tangkap outputnya
+          MLFLOW_OUTPUT=$(mlflow run workflow_CI/MLProject/)
+          echo "$MLFLOW_OUTPUT" # Cetak output untuk debugging
           
-          # Jalankan proyek MLflow dan simpan Run ID ke file
-          # --run-id-file adalah cara yang bersih untuk mendapatkan Run ID
-          mlflow run workflow_CI/MLProject/ --run-id-file $RUN_ID_FILE
-          
-          # Baca Run ID dari file
-          run_id=$(cat $RUN_ID_FILE)
+          # Ekstrak Run ID dari output MLflow (biasanya di baris yang mengandung "run id")
+          run_id=$(echo "$MLFLOW_OUTPUT" | grep "run id" | awk '{print $NF}')
           echo "Captured MLflow Run ID: $run_id"
           
           # Jadikan Run ID tersedia sebagai output langkah ini
