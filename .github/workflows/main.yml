@@ -22,8 +22,8 @@ jobs:
       - name: Install MLflow and dependencies
         shell: bash # Menggunakan bash shell untuk perintah
         run: |
-          # Perbarui lingkungan Conda berdasarkan conda.yaml
-          conda env update --file workflow_CI/MLProject/conda.yaml --name churn-prediction-env
+          # Perbarui lingkungan Conda berdasarkan conda.yml
+          conda env update --file workflow_CI/MLProject/conda.yml --name churn-prediction-env
           # Aktifkan lingkungan Conda yang baru dibuat
           conda activate churn-prediction-env
           # Pastikan mlflow terinstal di lingkungan ini (jika belum ada di conda.yaml)
