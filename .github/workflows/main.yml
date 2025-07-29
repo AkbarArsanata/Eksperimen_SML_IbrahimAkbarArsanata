@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3 # Mengambil kode dari repositori
+        uses: actions/checkout@v4 # Mengambil kode dari repositori (diperbarui ke v4)
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2 # Mengatur Miniconda di runner
@@ -54,7 +54,7 @@ jobs:
           echo "run_id=$run_id" >> $GITHUB_OUTPUT
 
       - name: Upload MLflow Artifacts (mlruns directory)
-        uses: actions/upload-artifact@v3 # Mengunggah artefak dari job ini
+        uses: actions/upload-artifact@v4 # Mengunggah artefak dari job ini (diperbarui ke v4)
         with:
           name: mlflow-artifacts # Nama artefak yang akan diunggah
           path: mlruns/ # Direktori yang akan diunggah
@@ -69,10 +69,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3 # Mengambil kode dari repositori
+        uses: actions/checkout@v4 # Mengambil kode dari repositori (diperbarui ke v4)
 
       - name: Download MLflow Artifacts
-        uses: actions/download-artifact@v3 # Mengunduh artefak 'mlruns' dari job sebelumnya
+        uses: actions/download-artifact@v4 # Mengunduh artefak 'mlruns' dari job sebelumnya (diperbarui ke v4)
         with:
           name: mlflow-artifacts
           path: mlruns/ # Path di mana artefak akan diunduh
