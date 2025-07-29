@@ -22,17 +22,21 @@ jobs:
       - name: Install MLflow and dependencies
         shell: bash # Menggunakan bash shell untuk perintah
         run: |
+          # Inisialisasi Conda untuk shell bash
+          conda init bash
           # Perbarui lingkungan Conda berdasarkan conda.yml
           conda env update --file workflow_CI/MLProject/conda.yml --name churn-prediction-env
           # Aktifkan lingkungan Conda yang baru dibuat
           conda activate churn-prediction-env
-          # Pastikan mlflow terinstal di lingkungan ini (jika belum ada di conda.yaml)
+          # Pastikan mlflow terinstal di lingkungan ini (jika belum ada di conda.yml)
           # pip install mlflow
 
       - name: Run MLflow Project and Capture Run ID
         id: mlflow_run # Memberikan ID ke langkah ini agar outputnya bisa diakses oleh job lain
         shell: bash
         run: |
+          # Inisialisasi Conda untuk shell bash
+          conda init bash
           conda activate churn-prediction-env
           # Set MLFLOW_TRACKING_URI ke direktori lokal di runner GitHub Actions
           # Ini akan menyimpan artefak MLflow (termasuk model) di folder 'mlruns'
@@ -86,6 +90,8 @@ jobs:
       - name: Install MLflow
         shell: bash
         run: |
+          # Inisialisasi Conda untuk shell bash
+          conda init bash
           conda activate base # Atau buat env baru jika diperlukan
           pip install mlflow # Instal MLflow untuk menggunakan 'mlflow build-docker'
 
