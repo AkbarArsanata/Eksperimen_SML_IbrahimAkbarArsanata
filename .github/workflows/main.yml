@@ -18,26 +18,26 @@ jobs:
         with:
           python-version: "3.9" # Pastikan versi Python sesuai dengan conda.yaml
           auto-activate-base: false # Jangan aktifkan base environment secara otomatis
+          # Tambahkan baris ini untuk menginisialisasi shell secara otomatis
+          auto-activate-base: false
+          activate-environment: churn-prediction-env # Secara otomatis mengaktifkan lingkungan ini
 
       - name: Install MLflow and dependencies
-        shell: bash # Menggunakan bash shell untuk perintah
+        # Menggunakan bash -l {0} untuk memastikan shell adalah login shell dan Conda diinisialisasi
+        shell: bash -l {0}
         run: |
-          # Inisialisasi Conda untuk shell bash
-          conda init bash
           # Perbarui lingkungan Conda berdasarkan conda.yml
           conda env update --file workflow_CI/MLProject/conda.yml --name churn-prediction-env
-          # Aktifkan lingkungan Conda yang baru dibuat
-          conda activate churn-prediction-env
-          # Pastikan mlflow terinstal di lingkungan ini (jika belum ada di conda.yml)
-          # pip install mlflow
+          # Lingkungan harusnya sudah aktif karena 'activate-environment' di setup-miniconda
+          # Jika tidak, Anda bisa menambahkan 'conda activate churn-prediction-env' di sini
 
       - name: Run MLflow Project and Capture Run ID
         id: mlflow_run # Memberikan ID ke langkah ini agar outputnya bisa diakses oleh job lain
-        shell: bash
+        # Menggunakan bash -l {0} untuk memastikan shell adalah login shell dan Conda diinisialisasi
+        shell: bash -l {0}
         run: |
-          # Inisialisasi Conda untuk shell bash
-          conda init bash
-          conda activate churn-prediction-env
+          # Lingkungan harusnya sudah aktif karena 'activate-environment' di setup-miniconda
+          # Jika tidak, Anda bisa menambahkan 'conda activate churn-prediction-env' di sini
           # Set MLFLOW_TRACKING_URI ke direktori lokal di runner GitHub Actions
           # Ini akan menyimpan artefak MLflow (termasuk model) di folder 'mlruns'
           export MLFLOW_TRACKING_URI=./mlruns
@@ -86,13 +86,15 @@ jobs:
         with:
           python-version: "3.9"
           auto-activate-base: false
+          # Tambahkan baris ini untuk menginisialisasi shell secara otomatis
+          auto-activate-base: false
+          activate-environment: base # Secara otomatis mengaktifkan lingkungan base untuk pip install mlflow
 
       - name: Install MLflow
-        shell: bash
+        # Menggunakan bash -l {0} untuk memastikan shell adalah login shell dan Conda diinisialisasi
+        shell: bash -l {0}
         run: |
-          # Inisialisasi Conda untuk shell bash
-          conda init bash
-          conda activate base # Atau buat env baru jika diperlukan
+          # Lingkungan base harusnya sudah aktif karena 'activate-environment' di setup-miniconda
           pip install mlflow # Instal MLflow untuk menggunakan 'mlflow build-docker'
 
       - name: Log in to Docker Hub
@@ -102,7 +104,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }} # Mengambil password/token dari GitHub Secrets
 
       - name: Build and Push Docker Image
-        shell: bash
+        # Menggunakan bash -l {0} untuk memastikan shell adalah login shell dan Conda diinisialisasi
+        shell: bash -l {0}
         run: |
           # Dapatkan Run ID dari output job 'train-model'
           MLFLOW_RUN_ID="${{ needs.train-model.outputs.run_id }}"
