@@ -23,7 +23,7 @@ jobs:
         shell: bash # Menggunakan bash shell untuk perintah
         run: |
           # Perbarui lingkungan Conda berdasarkan conda.yaml
-          conda env update --file MLProject/conda.yaml --name churn-prediction-env
+          conda env update --file workflow_CI/MLProject/conda.yaml --name churn-prediction-env
           # Aktifkan lingkungan Conda yang baru dibuat
           conda activate churn-prediction-env
           # Pastikan mlflow terinstal di lingkungan ini (jika belum ada di conda.yaml)
@@ -43,7 +43,7 @@ jobs:
           
           # Jalankan proyek MLflow dan simpan Run ID ke file
           # --run-id-file adalah cara yang bersih untuk mendapatkan Run ID
-          mlflow run MLProject/ --run-id-file $RUN_ID_FILE
+          mlflow run workflow_CI/MLProject/ --run-id-file $RUN_ID_FILE
           
           # Baca Run ID dari file
           run_id=$(cat $RUN_ID_FILE)
