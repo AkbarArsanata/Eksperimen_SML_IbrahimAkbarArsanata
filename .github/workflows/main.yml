@@ -18,8 +18,6 @@ jobs:
         with:
           python-version: "3.9" # Pastikan versi Python sesuai dengan conda.yaml
           auto-activate-base: false # Jangan aktifkan base environment secara otomatis
-          # Tambahkan baris ini untuk menginisialisasi shell secara otomatis
-          auto-activate-base: false
           activate-environment: churn-prediction-env # Secara otomatis mengaktifkan lingkungan ini
 
       - name: Install MLflow and dependencies
@@ -85,8 +83,6 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2 # Mengatur Miniconda
         with:
           python-version: "3.9"
-          auto-activate-base: false
-          # Tambahkan baris ini untuk menginisialisasi shell secara otomatis
           auto-activate-base: false
           activate-environment: base # Secara otomatis mengaktifkan lingkungan base untuk pip install mlflow
 
