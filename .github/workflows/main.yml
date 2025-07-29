@@ -24,8 +24,8 @@ jobs:
         # Menggunakan bash -l {0} untuk memastikan shell adalah login shell dan Conda diinisialisasi
         shell: bash -l {0}
         run: |
-          # Perbarui lingkungan Conda berdasarkan conda.yaml
-          conda env update --file workflow_CI/MLProject/conda.yaml --name churn-prediction-env
+          # Perbarui lingkungan Conda berdasarkan conda.yml
+          conda env update --file workflow_CI/MLProject/conda.yml --name churn-prediction-env
           # Lingkungan harusnya sudah aktif karena 'activate-environment' di setup-miniconda
           # Jika tidak, Anda bisa menambahkan 'conda activate churn-prediction-env' di sini
 
