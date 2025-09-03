@@ -1,81 +1,16 @@
-# 📚 Deep Learning Formula
+```mermaid
+flowchart TB
+    A["Ambil Data<br/>(Google Sheet CSV,<br/>Data Cleaning,<br/>Validasi, Distribusi)"]
+    B["OCR<br/>(Konversi PDF ke Teks,<br/>Tesseract, CNN+LSTM)"]
+    C["Klasifikasi Dokumen<br/>(Preprocessing,<br/>LLM Gemini,<br/>Evaluasi & Integrasi BigQuery)"]
+    D["Named Entity Recognition (NER)<br/>(Ekstraksi Tanggal, Waktu,<br/>Lokasi, Stakeholders)"]
+    E["Integrasi ke Google Calendar<br/>(Validasi, Format ISO 8601,<br/>Penjadwalan & API)"]
+    F["Vector Embeddings<br/>(TF-IDF → Embedding,<br/>Cosine Similarity)"]
+    G["Matching Engine<br/>(ANN Search,<br/>Ranking, Evaluasi)"]
+    H["Integrasi LLM Gemini<br/>(RAG, Prompt Engineering,<br/>Jawaban Kontekstual)"]
 
-Deep learning can be described mathematically as a **composition of functions**.
+    %% Alur utama
+    A --> B --> C --> D --> E
 
----
-
-## 🔑 General Formula
-
-For a neural network with **L layers**:
-
-$$
-\hat{y} = f(x; \theta) = f^{(L)}(f^{(L-1)}(\dots f^{(1)}(x)))
-$$
-
-- \(x\) = input data  
-- \(\hat{y}\) = model prediction  
-- \(\theta = \{W^{(1)}, b^{(1)}, \dots, W^{(L)}, b^{(L)}\}\) = weights and biases  
-
----
-
-## 🔂 Forward Propagation
-
-For each layer \(l\):
-
-$$
-z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}
-$$
-
-$$
-a^{(l)} = \sigma^{(l)}(z^{(l)})
-$$
-
-- \(a^{(0)} = x\) (input layer)  
-- \(z^{(l)}\) = linear transformation  
-- \(\sigma^{(l)}\) = activation function (ReLU, sigmoid, tanh, etc.)  
-
----
-
-## 🎯 Loss Function
-
-To measure the error between true label \(y\) and prediction \(\hat{y}\):
-
-- **Mean Squared Error (Regression):**
-
-$$
-\mathcal{L} = \frac{1}{N} \sum_{i=1}^N (y_i - \hat{y}_i)^2
-$$
-
-- **Cross-Entropy (Classification):**
-
-$$
-\mathcal{L} = - \sum_{i=1}^N y_i \log(\hat{y}_i)
-$$
-
----
-
-## 🔄 Backpropagation (Gradient Descent Update)
-
-Update weights and biases:
-
-$$
-W^{(l)} \leftarrow W^{(l)} - \eta \frac{\partial \mathcal{L}}{\partial W^{(l)}}
-$$
-
-$$
-b^{(l)} \leftarrow b^{(l)} - \eta \frac{\partial \mathcal{L}}{\partial b^{(l)}}
-$$
-
-- \(\eta\) = learning rate  
-- Gradients computed using **chain rule**  
-
----
-
-## ✅ Final Summary
-
-The deep learning workflow can be summarized as:
-
-$$
-\hat{y} = f(x; \theta), \quad
-\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}(y, f(x; \theta))
-$$
+    %% Cabang dari preprocessing (sebelum klasifikasi final)
+    C -. "Pasca Preprocessing" .-> F --> G --> H
